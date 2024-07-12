@@ -73,6 +73,14 @@ This project demonstrates the design and setup of a data engineering platform fo
 2. Set up data sources to connect with Amazon Redshift.
 3. Build interactive reports and dashboards.
 
+### Docker Setup
+1. Set the `HOST_IP` environment variable with your machine's IP address:
+   `export HOST_IP=123.456.456.123`  # Replace with your actual IP address
+2. Start the Docker services:
+   `docker-compose up -d`
+3. Verify that all services are running:
+   `docker-compose ps`
+
 ## Usage
 
 1. Start Kafka and Apache ZooKeeper.
