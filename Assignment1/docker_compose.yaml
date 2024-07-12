@@ -1,0 +1,108 @@
+version: '3'
+
+# Common configuration for Spark worker nodes
+x-spark-common: &spark-common
+  image: bitnami/spark:latest
+  volumes:
+    - ./jobs:/opt/bitnami/spark/jobs  # Mount local jobs directory to container
+  command: bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077  # Command to run Spark worker
+  depends_on:
+    - spark-master  # Wait for spark-master to be ready
+  environment:
+    SPARK_MODE: Worker  # Set Spark mode to worker
+    SPARK_WORKER_CORES: 2  # Allocate 2 CPU cores to the worker
+    SPARK_WORKER_MEMORY: 1g  # Allocate 1GB memory to the worker
+    SPARK_MASTER_URL: spark://spark-master:7077  # URL of the Spark master
+  networks:
+    - bridge  # Connect to default Docker bridge network
+
+services:
+  # Zookeeper service
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.3
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"  # Expose port 2181 for Zookeeper client connections
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    healthcheck:
+      test: ['CMD', 'bash', '-c', "echo 'ruok' | nc localhost 2181"]  # Health check to ensure Zookeeper is running
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bridge  # Connect to default Docker bridge network
+
+  # Kafka broker service
+  broker:
+    image: confluentinc/cp-server:7.5.3
+    hostname: broker
+    container_name: broker
+    depends_on:
+      zookeeper:
+        condition: service_healthy  # Wait for Zookeeper to be healthy
+    ports:
+      - "9092:9092"  # Expose port 9092 for Kafka connections
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'  # Connect to Zookeeper
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${HOST_IP}:9092  # Advertise Kafka broker's external address
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://:9092  # Listen on port 9092 for plain text connections
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_TOPIC_CREATION: true  # Automatically create topics when needed
+    healthcheck:
+      test: ['CMD', 'bash', '-c', "nc -z localhost 9092"]  # Health check to ensure Kafka is running
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - bridge  # Connect to default Docker bridge network
+
+  # Spark master node service
+  spark-master:
+    image: bitnami/spark:latest
+    volumes:
+      - ./jobs:/opt/bitnami/spark/jobs  # Mount local jobs directory to container
+    command: bin/spark-class org.apache.spark.deploy.master.Master  # Command to run Spark master
+    ports:
+      - "9090:8080"  # Expose port 8080 for Spark master web UI
+      - "7077:7077"  # Expose port 7077 for Spark master connections
+    networks:
+      - bridge  # Connect to default Docker bridge network
+
+  # Spark worker nodes
+  spark-worker-1:
+    <<: *spark-common  # Use common Spark worker configuration
+
+  spark-worker-2:
+    <<: *spark-common  # Use common Spark worker configuration
+
+  # Additional Spark workers (optional)
+  # spark-worker-3:
+  #   <<: *spark-common
+
+  # spark-worker-4:
+  #   <<: *spark-common
+
+  # Kafka UI service for monitoring Kafka clusters
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 28080:8080  # Expose port 8080 for Kafka UI web interface
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'  # Enable dynamic configuration
+    networks:
+      - bridge  # Connect to default Docker bridge network
+
+networks:
+  bridge:  # Define the default bridge network explicitly
+    driver: bridge
