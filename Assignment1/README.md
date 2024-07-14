@@ -61,6 +61,16 @@ This project demonstrates the design and setup of a data engineering platform fo
 1. Install and configure Kafka and Apache ZooKeeper.
 2. Create Kafka topics for data ingestion from various smart city sources.
 
+#### Docker Setup
+1. Set the `HOST_IP` environment variable with your machine's IP address:
+   `export HOST_IP=123.456.456.123`  # Replace with your actual IP address
+2. Start the Docker services:
+   `docker-compose up -d`
+3. Verify that all services are running:
+   `docker-compose ps`
+![containers](Containers.png)
+4. Use test_kafkaConsumer.py and test_kafkaProducer.py to test the Kafka functionality.
+
 ### AWS Services
 1. Configure AWS S3 buckets for storing raw and processed data.
 2. Set up AWS Glue crawlers and jobs for ETL processes.
@@ -68,18 +78,42 @@ This project demonstrates the design and setup of a data engineering platform fo
 4. Configure Amazon Athena for querying data in S3.
 5. Set up AWS Lambda functions for streaming data to Power BI.
 
+#### Create S3 Buckets
+1. Create S3 buckets for raw and processed data.
+![aws_s3](aws_s3.png)
+
+#### Create Glue Crawler
+1. Create a Glue crawler to ingest data from various smart city sources.
+![aws_glue](aws_glue.png)
+
+#### Create Glue Job
+1. Create a Glue job to transform and aggregate data from Kafka to Parquet format.
+![aws_glue_job](aws_glue_job.png)
+
+#### Create Redshift Cluster
+1. Create an Amazon Redshift cluster for data warehousing.
+![aws_redshift](aws_redshift.png)
+
+#### Create Athena Database
+1. Create an Athena database for storing aggregated data.
+![aws_athena](aws_athena.png)
+
+#### Create Athena Table
+1. Create an Athena table for storing aggregated data.
+![aws_athena_table](aws_athena_table.png)
+
+#### Create Lambda Function
+1. Create an AWS Lambda function for streaming data to Power BI.
+![aws_lambda](aws_lambda.png)
+
+#### Create Power BI Workspace
+1. Create a Power BI workspace.
+![aws_powerbi](aws_powerbi.png)
+
 ### Power BI
 1. Create a Power BI workspace.
 2. Set up data sources to connect with Amazon Redshift.
 3. Build interactive reports and dashboards.
-
-### Docker Setup
-1. Set the `HOST_IP` environment variable with your machine's IP address:
-   `export HOST_IP=123.456.456.123`  # Replace with your actual IP address
-2. Start the Docker services:
-   `docker-compose up -d`
-3. Verify that all services are running:
-   `docker-compose ps`
 
 ## Usage
 

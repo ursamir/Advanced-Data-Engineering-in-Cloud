@@ -1,0 +1,44 @@
+Assignment - 1
+Based on data engineering or processing for 10MB, 1 GB or 10GB or 100GB
+Assignment 1: Architecture Design and Setup
+1. Design the high-level architecture of the data engineering platform, including the following components:
+   - Data Ingestion
+   - Data Storage
+   - Data Processing
+   - Data Aggregation
+   - Data Visualization
+2. Create a GitHub repository to store and version control your code and configuration files.
+3. Provide a brief README.md file in the repository with an overview of the project and the architecture diagram.
+4. Set up the necessary AWS services and configure the basic infrastructure for the platform.
+
+Assignment - 2
+Assignment 2: Data Ingestion and Processing
+1. Implement the data ingestion mechanism using AWS Kinesis Data Streams or AWS Direct Connect to stream data from a source to Amazon S3.
+2. Develop and test the data processing pipeline using AWS Glue or Amazon EMR (Elastic MapReduce) with Apache Spark or Hadoop.
+3. Apply data transformation and cleansing techniques to prepare the data for aggregation and analysis.
+4. Implement data partitioning and indexing strategies to optimize query performance.
+5. Update the GitHub repository with the code and configuration files for data ingestion and processing.
+
+Assignment - 3
+Assignment 3: Data Aggregation and Visualization
+1. Configure AWS Redshift or Amazon Athena to aggregate the processed data and enable fast querying and analysis.
+2. Design and implement the data aggregation queries and optimize them for performance.
+3. Integrate Amazon QuickSight or a third-party BI tool for data visualization.
+4. Create sample dashboards and reports to showcase the insights derived from the aggregated data.
+5. Update the GitHub repository with the code and configuration files for data aggregation and visualization.
+
+Project
+Final Project: End-to-End Data Engineering Platform
+1. Integrate the components developed in the previous assignments to create a complete end-to-end data engineering platform.
+2. Implement data retention policies and configure data lifecycle management in Amazon S3.
+3. Apply security best practices, such as enabling encryption for data at rest and in transit, setting up proper access controls, and using AWS Identity and Access Management (IAM) for authentication and authorization.
+4. Optimize the platform for cost by utilizing cost-effective storage options, such as Amazon S3 Glacier for long-term data retention, and monitoring and optimizing resource utilization.
+5. Conduct thorough testing of the platform, including data ingestion, processing, aggregation, and visualization, to ensure data integrity and performance.
+6. Implement continuous integration and continuous deployment (CI/CD) processes using AWS services like AWS CodePipeline and AWS CodeBuild to automate the deployment and updates of the platform.
+7. Prepare comprehensive documentation, including:
+   - Detailed README.md file with setup instructions, usage guidelines, and troubleshooting tips.
+   - Updated architecture diagrams illustrating the components and data flow of the platform.
+   - Code samples, scripts, and configuration files for the entire platform.
+   - Documentation on the selected AWS services, their configurations, and how they integrate with each other.
+8. Demonstrate the functionality of the platform by ingesting a sample dataset, processing it, aggregating the results, and creating visualizations.
+9. Prepare a project presentation highlighting the key features, challenges encountered, and lessons learned during the implementation process.
