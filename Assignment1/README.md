@@ -3,34 +3,34 @@
 ## Overview
 This project demonstrates the design and setup of a data engineering platform for analyzing streaming data from IoT devices in a smart city. The platform integrates various components for data ingestion, storage, processing, aggregation, and visualization to provide real-time insights and facilitate data-driven decision-making.
 
-## Architecture Overview
+## Architecture Design
 
 ![AWS Data Processing End-to-end Pipeline](architecture.png)
 
-## Components
+### Components
 
-### Data Ingestion
+#### Data Ingestion
 - **Kafka:** Utilized for streaming data ingestion from various smart city sources such as weather sensors, IoT devices, mobile devices (iOS and Android), and GPS data.
 - **Apache ZooKeeper:** Provides distributed coordination and management for Kafka clusters.
 
-### Data Storage
+#### Data Storage
 - **Amazon S3:** Stores both raw and processed data in a scalable and durable manner, supporting various formats including Parquet for optimized analytics.
 - **Amazon Redshift:** Data warehousing solution used to store and query structured data, enabling complex analytics and reporting.
 
-### Data Processing
+#### Data Processing
 - **Apache Spark:** Processes streaming and batch data in real-time, performing complex transformations and computations to derive actionable insights.
 - **AWS Glue:** ETL (Extract, Transform, Load) service for preparing, cleaning, and transforming data to make it analytics-ready.
 
-### Data Aggregation
+#### Data Aggregation
 - **AWS Glue:** Also performs data aggregation during the ETL process, organizing and summarizing data for efficient querying.
 - **Amazon Athena:** Enables SQL querying of data stored in Amazon S3, facilitating on-the-fly aggregation and analysis without the need for a dedicated server.
 
-### Data Visualization
+#### Data Visualization
 - **Power BI:** Creates interactive reports and dashboards to visualize aggregated data, providing stakeholders with real-time insights into the city's operations.
 - **Power BI API:** Streams data directly to Power BI for real-time visualization, ensuring that the latest data is always available for decision-making.
-- **Streamlit:** Easy data vizualization tool.
+- **Streamlit:** Easy data visualization tool.
 
-## Data Flow Description
+### Data Flow Description
 
 1. **Data Ingestion:**
    - Data from various sources such as weather sensors, IoT devices, mobile devices, and GPS data are ingested into Kafka, coordinated by Apache ZooKeeper.
@@ -50,7 +50,7 @@ This project demonstrates the design and setup of a data engineering platform fo
 6. **Data Visualization:**
    - Data from Amazon Redshift is streamed to Power BI via AWS Lambda for real-time visualization, or accessed directly by Power BI to create dashboards and reports.
 
-## Prerequisites
+### Prerequisites
 
 - AWS account with necessary permissions for using S3, Redshift, Glue, Athena, and Lambda.
 - Kafka and Apache ZooKeeper setup.
@@ -81,8 +81,6 @@ This project demonstrates the design and setup of a data engineering platform fo
 #### Create S3 Buckets
 1. Create S3 buckets for raw and processed data.
 ![aws_s3](aws_s3.png)
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 

@@ -7,85 +7,38 @@ This project demonstrates the design and setup of a data engineering platform fo
 
 ![AWS Data Processing End-to-end Pipeline](architecture.png)
 
-## Components
+## Data Ingress and Processing
+1. Use the `simulate.py` script to simulate data ingestion.
 
-### Data Ingestion
-- **Kafka:** Utilized for streaming data ingestion from various smart city sources such as weather sensors, IoT devices, mobile devices (iOS and Android), and GPS data.
-- **Apache ZooKeeper:** Provides distributed coordination and management for Kafka clusters.
+   ![simulate0](simulate0.png)
+   ![simulate1](simulate1.png)
 
-### Data Storage
-- **Amazon S3:** Stores both raw and processed data in a scalable and durable manner, supporting various formats including Parquet for optimized analytics.
-- **Amazon Redshift:** Data warehousing solution used to store and query structured data, enabling complex analytics and reporting.
+2. Copy the `aws.json`, `kafka.json`, `spark.json`, and `spark_job.py` files to the `project-spark-master-1` container.
 
-### Data Processing
-- **Apache Spark:** Processes streaming and batch data in real-time, performing complex transformations and computations to derive actionable insights.
-- **AWS Glue:** ETL (Extract, Transform, Load) service for preparing, cleaning, and transforming data to make it analytics-ready.
+   ```
+   docker cp aws.json project-spark-master-1:/opt/bitnami/spark/aws.json
 
-### Data Aggregation
-- **AWS Glue:** Also performs data aggregation during the ETL process, organizing and summarizing data for efficient querying.
-- **Amazon Athena:** Enables SQL querying of data stored in Amazon S3, facilitating on-the-fly aggregation and analysis without the need for a dedicated server.
+   docker cp kafka.json project-spark-master-1:/opt/bitnami/spark/kafka.json
 
-### Data Visualization
-- **Power BI:** Creates interactive reports and dashboards to visualize aggregated data, providing stakeholders with real-time insights into the city's operations.
-- **Power BI API:** Streams data directly to Power BI for real-time visualization, ensuring that the latest data is always available for decision-making.
-- **Streamlit:** Easy data vizualization tool.
+   docker cp spark.json project-spark-master-1:/opt/bitnami/spark/spark.json
 
-## Data Flow Description
+   docker cp spark_job.py project-spark-master-1:/opt/bitnami/spark/spark_job.py
+   ```
 
-1. **Data Ingestion:**
-   - Data from various sources such as weather sensors, IoT devices, mobile devices, and GPS data are ingested into Kafka, coordinated by Apache ZooKeeper.
-   
-2. **Data Processing:**
-   - Kafka streams the data to Apache Spark for real-time processing and batch computations. The processed data is then stored in Parquet format for efficient querying.
-   
-3. **Data Storage:**
-   - The processed data is saved to Amazon S3 in both raw and transformed states, ensuring that historical data is preserved and readily accessible.
-   
-4. **Data Aggregation:**
-   - AWS Glue crawlers catalog the raw and transformed data, preparing it for aggregation and analysis using Amazon Athena.
-   
-5. **Data Storage and Aggregation:**
-   - The aggregated data is stored in Amazon Redshift, where it can be queried for more complex analytics and reporting.
-   
-6. **Data Visualization:**
-   - Data from Amazon Redshift is streamed to Power BI via AWS Lambda for real-time visualization, or accessed directly by Power BI to create dashboards and reports.
+3. Run the `spark_job.py` script in the `project-spark-master-1` container.
+   ```
+   docker exec -it project-spark-master-1 spark-submit --packages org.apache.hadoop:hadoop-aws:3.3.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1 spark_job.py
+   ```
+   ![spark_job](spark_job.png)
 
-## Prerequisites
+4. Verify data at S3 buckets.
+![s3](s3.png)
 
-- AWS account with necessary permissions for using S3, Redshift, Glue, Athena, and Lambda.
-- Kafka and Apache ZooKeeper setup.
+5. Create AWS Glue crawlers and jobs for ETL processes.
+![glue](glue.png)
 
-## Setup
-
-### Kafka and Apache ZooKeeper
-1. Install and configure Kafka and Apache ZooKeeper.
-2. Create Kafka topics for data ingestion from various smart city sources.
-
-#### Docker Setup
-1. Set the `HOST_IP` environment variable with your machine's IP address:
-   `export HOST_IP=123.456.456.123`  # Replace with your actual IP address
-2. Start the Docker services:
-   `docker-compose up -d`
-3. Verify that all services are running:
-   `docker-compose ps`
-![containers](Containers.png)
-4. Use test_kafkaConsumer.py and test_kafkaProducer.py to test the Kafka functionality.
-
-### AWS Services
-1. Configure AWS S3 buckets for storing raw and processed data.
-2. Set up AWS Glue crawlers and jobs for ETL processes.
-3. Create an Amazon Redshift cluster for data warehousing.
-4. Configure Amazon Athena for querying data in S3.
-5. Set up AWS Lambda functions for streaming data to Power BI.
-
-#### Create S3 Buckets
-1. Create S3 buckets for raw and processed data.
-![aws_s3](aws_s3.png)
-
-### Data Ingress
-
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+6. Run AWS Athena queries.
+![athena](athena.png)
 
 ## Acknowledgments
 
