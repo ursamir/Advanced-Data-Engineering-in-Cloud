@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, from_json
+from pyspark.sql.functions import col, from_json, lit
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, TimestampType
 import json
 
@@ -17,16 +17,16 @@ with open('kafka.json', 'r') as f:
 
 def main():
     # Initialize Spark Session
-
     spark = SparkSession.builder \
         .appName("KafkaToS3") \
         .master(spark_url) \
-                .config("spark.jars.packages",
+        .config("spark.jars.packages",
                 "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1,"
                 "org.apache.hadoop:hadoop-aws:3.3.4") \
         .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
         .config("spark.hadoop.fs.s3a.access.key", configuration.get('AWS_ACCESS_KEY')) \
         .config("spark.hadoop.fs.s3a.secret.key", configuration.get('AWS_SECRET_KEY')) \
+        .config('spark.hadoop.fs.s3a.endpoint', configuration.get('S3_ENDPOINT')) \
         .config('spark.hadoop.fs.s3a.aws.credentials.provider',
                 'org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider') \
         .getOrCreate()
@@ -68,7 +68,7 @@ def main():
         StructField("timestamp", TimestampType(), True)
     ])
 
-    def read_kafka_topic(topic, schema):
+    def read_kafka_topic(topic, schema, source_name):
         return (spark.readStream
                 .format('kafka')
                 .option('kafka.bootstrap.servers', kafka_url)
@@ -79,27 +79,28 @@ def main():
                 .selectExpr('CAST(value AS STRING)')
                 .select(from_json(col('value'), schema).alias('data'))
                 .select('data.*')
-                .withWatermark('timestamp', '2 minutes')
-                )
+                .withColumn("source", lit(source_name))
+                .withWatermark('timestamp', '2 minutes'))
 
     def streamWriter(input_df, checkpoint_folder, output_path):
-        return (input_df.writeStream
-                .format('parquet')
+        return (input_df.coalesce(1)
+                .writeStream
+                .format('csv')
                 .option('checkpointLocation', checkpoint_folder)
                 .option('path', output_path)
+                .option('header', 'true')
                 .outputMode('append')
                 .start())
 
-    vehicleDF = read_kafka_topic('vehicle_data', vehicleSchema).alias('vehicle')
-    failuresDF = read_kafka_topic('failures_data', failureSchema).alias('failures')
-    weatherDF = read_kafka_topic('weather_data', weatherSchema).alias('weather')
+    vehicleDF = read_kafka_topic('vehicle_data', vehicleSchema, "vehicle")
+    failuresDF = read_kafka_topic('failures_data', failureSchema, "failures")
+    weatherDF = read_kafka_topic('weather_data', weatherSchema, "weather")
 
-    query1 = streamWriter(vehicleDF, 's3a://g23ai1052/checkpoints/vehicle_data',
-                          's3a://g23ai1052/data/vehicle_data')
-    query2 = streamWriter(failuresDF, 's3a://g23ai1052/checkpoints/failures_data',
-                          's3a://g23ai1052/data/failures_data')
-    query3 = streamWriter(weatherDF, 's3a://g23ai1052/checkpoints/weather_data',
-                          's3a://g23ai1052/data/weather_data')
+    common_output_path = 's3a://g23ai1052/new/'
+
+    query1 = streamWriter(vehicleDF, 's3a://g23ai1052/new/checkpoints/vehicle_data', common_output_path)
+    query2 = streamWriter(failuresDF, 's3a://g23ai1052/new/checkpoints/failures_data', common_output_path)
+    query3 = streamWriter(weatherDF, 's3a://g23ai1052/new/checkpoints/weather_data', common_output_path)
 
     query1.awaitTermination()
     query2.awaitTermination()

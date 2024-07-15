@@ -1,0 +1,12 @@
+docker exec -it project-spark-master-1 spark-submit --packages org.apache.hadoop:hadoop-aws:3.3.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1 spark_test.py 
+
+
+docker cp spark_test.py project-spark-master-1:/opt/bitnami/spark/spark_test.py
+
+docker cp aws.json project-spark-master-1:/opt/bitnami/spark/aws.json
+docker cp kafka.json project-spark-master-1:/opt/bitnami/spark/kafka.json
+docker cp spark.json project-spark-master-1:/opt/bitnami/spark/spark.json
+docker cp spark_job.py project-spark-master-1:/opt/bitnami/spark/spark_job.py
+
+docker exec -it project-spark-master-1 spark-submit --packages org.apache.hadoop:hadoop-aws:3.3.1,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1 spark_job.py 
+
