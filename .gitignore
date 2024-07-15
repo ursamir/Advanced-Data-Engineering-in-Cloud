@@ -1,2 +1,5 @@
 venv/*
 environment.json
+aws.json
+spark.json
+kafka.json
